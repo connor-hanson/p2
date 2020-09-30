@@ -61,4 +61,11 @@ char *dequeueString(Queue *q) {
 }
 
 void printQueueStats(Queue *q) {
+    printf("%s\n", "Queue Statistics: ");
+    printf("%s%d\n", "Number of entries: ", q->numEntries);
+    printf("%s%d\n", "Capacity: ", q->capacity);
+    printf("%s%d\n", "Enqueue Count: ", q->enqueueCount);
+    printf("%s%d\n", "Dequeue Count: ", q->dequeueCount);
+    printf("%s%d\n", "Enqueue Time: ", q->enqueueTime);
+    printf("%s%d\n", "Dequeue Time: ", q->dequeueTime);
 }
