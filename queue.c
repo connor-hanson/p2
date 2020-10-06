@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <semaphore.h>
 
 typedef struct {
     char **data; // entirety of array of strings
@@ -36,6 +37,8 @@ Queue *createStringQueue(int size) {
     queue->numEntries = 0;
     queue->capacity = size;
     queue->head = NULL; // not defined
+    
+    
 
     return queue;
 }
@@ -43,8 +46,10 @@ Queue *createStringQueue(int size) {
 // places the pointer to the string at the end of the queue. 
 // If the queue is full, block until space is available
 void enqueueString(Queue *q, char *string) {
+    sem_wait(&resource);
     if (q->numEntries == q->capacity) {
-        // lock
+        sem_post(&resource);
+        sem_wait(&writer);
     }
     // lock is free
     if (q->numEntries == 0) {
@@ -54,9 +59,21 @@ void enqueueString(Queue *q, char *string) {
     }
 
     q->numEntries += 1;
+    sem_post(&resource);
+    sem_post(&reader);
 }
 
+//TODO: actual code lol
 char *dequeueString(Queue *q) {
+    sem_wait(&resource);
+    if(//empty){
+        sem_post(&resource);
+        sem_wait(&reader);
+    }
+    //actual code
+    sem_post(&resource);
+    sem_post(&writer);
+    
     return NULL;
 }
 
