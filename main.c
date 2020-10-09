@@ -94,17 +94,21 @@ void *writer(void *arg){
 
 int main(){
 	if(!(sem_init(&resource, 0, 1)) && !(sem_init(&writer, 0, 1)) && !(sem_init(&reader, 0, 1))){
+		// make queues
 		queue1 = CreateStringQueue(QUEUE_SIZE);
 		queue2 = CreateStringQueue(QUEUE_SIZE);
 		queue3 = CreateStringQueue(QUEUE_SIZE);
+		// make threads
 		pthread_create(&read, NULL, reader, NULL);
 		pthread_create(&mun1, NULL, munch1, NULL);
 		pthread_create(&mun2, NULL, munch2, NULL);
 		pthread_create(&writ, NULL, writer, NULL);
+		// join with terminated threads
 		pthread_join(read, NULL);
 		pthread_join(mun1, NULL);
 		pthread_join(mun2, NULL);
 		pthread_join(writ, NULL);
+		// free resources
 		sem_destroy(&resource);
 		sem_destory(&writer);
 		sem_destory(&reader);

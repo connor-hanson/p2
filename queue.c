@@ -3,7 +3,7 @@
 #include <semaphore.h>
 
 typedef struct {
-    char **data; // entirety of array of strings
+    //char **data; // entirety of array of strings
     char **head; // pointer to last added string
     int numEntries;
     int capacity; 
@@ -28,51 +28,75 @@ Queue *createStringQueue(int size) {
         return NULL;
     }
 
-    queue->data = malloc(size * sizeof(char**));
-    if (queue->data == NULL) {
+    // returns pointer to where head of list should be, do not lose pointer
+    queue->head = malloc(size * sizeof(char**));
+    if (queue->head == NULL) {
         printf("Error allocating memory to queue data");
         return NULL;
     }
 
     queue->numEntries = 0;
     queue->capacity = size;
-    queue->head = NULL; // not defined
-    
-    
 
+    // return ptr to new queue structure
     return queue;
 }
 
 // places the pointer to the string at the end of the queue. 
 // If the queue is full, block until space is available
 void enqueueString(Queue *q, char *string) {
-    sem_wait(&resource);
+    //sem_wait(&resource);
+    // if the queue is full, wait
     if (q->numEntries == q->capacity) {
-        sem_post(&resource);
-        sem_wait(&writer);
+        return; // FIXME
+        //sem_post(&resource);
+        //sem_wait(&writer);
     }
     // lock is free
     if (q->numEntries == 0) {
-        q->head = q->data; // set initial pointer
+        // do nothing, pointer stays where it is, but is now allocated to data
+        //q->head = q->data; // set initial pointer
     } else {
         q->head = q->head + sizeof(char**); // increment to the next pointer
     }
 
+    // malloc string 
+    q->head = malloc(sizeof(string));
+    if (q->head == NULL) {
+        // find way to cleanly shutdown program without exit(0)
+        // better fucking work ig
+        // printf not necessarily the best option for threaded programs
+        perror("Memory allocation of string failed");
+        // error
+    }
+
+    // now deref ptr and set its val
+    *(q->head) = string;
+
+    // change fields
     q->numEntries += 1;
-    sem_post(&resource);
-    sem_post(&reader);
+    q->enqueueCount += 1;
+    // figure something out for time
+
+    //sem_post(&resource);
+    //sem_post(&reader);
 }
 
 //TODO: actual code lol
 char *dequeueString(Queue *q) {
-    sem_wait(&resource);
-    if(//empty){
-        sem_post(&resource);
-        sem_wait(&reader);
+    //sem_wait(&resource);
+    // if queue is empty, wait
+    if(q->numEntries == 0) {
+        //sem_post(&resource);
+        //sem_wait(&reader);
     }
-    //actual code
-    sem_post(&resource);
-    sem_post(&writer);
+    // queue is no longer empty, dequeue string by size of string being removed
+    q->head = q->head - sizeof(q->head);
+    q->numEntries -= 1;
+    q->dequeueCount += 1;
+    // probably need to free the resource, will get to that later
+    //sem_post(&resource);
+    //sem_post(&writer);
     
     return NULL;
 }
