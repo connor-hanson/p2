@@ -60,7 +60,7 @@ void enqueueString(Queue *q, char *string) {
         q->head = q->head + sizeof(char**); // increment to the next pointer
     }
 
-    // malloc string 
+    // malloc string, ptr to char*
     q->head = malloc(sizeof(string));
     if (q->head == NULL) {
         // find way to cleanly shutdown program without exit(0)
@@ -87,18 +87,23 @@ char *dequeueString(Queue *q) {
     //sem_wait(&resource);
     // if queue is empty, wait
     if(q->numEntries == 0) {
+        return NULL; // FIXME when synchronization implemented
         //sem_post(&resource);
         //sem_wait(&reader);
     }
+    char *retStr = *(q->head);
+
+    // free memory BEFORE losing ptr
+    printf("ayy");
+    free(q->head);
     // queue is no longer empty, dequeue string by size of string being removed
-    q->head = q->head - sizeof(q->head);
+    q->head = q->head - sizeof(char**);
     q->numEntries -= 1;
     q->dequeueCount += 1;
-    // probably need to free the resource, will get to that later
     //sem_post(&resource);
     //sem_post(&writer);
     
-    return NULL;
+    return retStr;
 }
 
 void printQueueStats(Queue *q) {
