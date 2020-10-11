@@ -1,18 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <semaphore.h>
-
-typedef struct {
-    //char **data; // entirety of array of strings
-    char **head; // pointer to last added string
-    int numEntries;
-    int capacity; 
-
-    int enqueueCount;
-    int dequeueCount;
-    int enqueueTime;
-    int dequeueTime;
-} Queue;
+#include "queue.h"
 
 //Dynamically allocate a new Queue structure and initialize it with an array of character points of length size. 
 //That means you'll malloc the queue structure and then malloc the char ** array pointed to from that structure. 
@@ -28,9 +17,10 @@ Queue *createStringQueue(int size) {
         return NULL;
     }
 
-    // returns pointer to where head of list should be, do not lose pointer
-    queue->head = malloc(size * sizeof(char**));
-    if (queue->head == NULL) {
+    // list is of char*, do not lose pointer. Head is dequeued
+    queue->firstMem = malloc(size * sizeof(char*));
+
+    if (queue->firstMem == NULL) {
         printf("Error allocating memory to queue data");
         return NULL;
     }
@@ -52,34 +42,62 @@ void enqueueString(Queue *q, char *string) {
         //sem_post(&resource);
         //sem_wait(&writer);
     }
-    // lock is free
+
+    // move head/tail pointer to firstMem if empty
     if (q->numEntries == 0) {
-        // do nothing, pointer stays where it is, but is now allocated to data
-        //q->head = q->data; // set initial pointer
+        q->head = q->firstMem;
+        q->tail = q->firstMem;
     } else {
-        q->head = q->head + sizeof(char**); // increment to the next pointer
+        // get check that tail is not at end of alloc'd memory
+        int memDiff = (q->tail - q->firstMem);
+        int okDiff = (q->capacity - 1) * sizeof(char*);
+
+        if (memDiff == okDiff) { // loop round to first byte of ok memory
+            q->tail = q->firstMem;
+            printf("resetting mem");
+        } else {
+            q->tail = q->tail + sizeof(char*); // increment by a ptr location. ++ should do this
+        }
     }
 
-    // malloc string, ptr to char*
-    q->head = malloc(sizeof(string));
-    if (q->head == NULL) {
-        // find way to cleanly shutdown program without exit(0)
-        // better fucking work ig
-        // printf not necessarily the best option for threaded programs
-        perror("Memory allocation of string failed");
-        // error
-    }
+    // now allocate memory/string to tail
+    //q->tail = malloc(sizeof(string));
+    *(q->tail) = string;
 
-    // now deref ptr and set its val
-    *(q->head) = string;
-
-    // change fields
     q->numEntries += 1;
     q->enqueueCount += 1;
-    // figure something out for time
+    return;
 
-    //sem_post(&resource);
-    //sem_post(&reader);
+
+    // // lock is free
+    // if (q->numEntries == 0) {
+    //     // do nothing, pointer stays where it is, but is now allocated to data
+    //     //q->head = q->data; // set initial pointer
+    // } else {
+    //     //q->head = q->head + sizeof(char**); // increment to the next pointer
+    //     (q->head)++;
+    // }
+
+    // // malloc string, ptr to char*
+    // q->head = malloc(sizeof(string));
+    // if (q->head == NULL) {
+    //     // find way to cleanly shutdown program without exit(0)
+    //     // better fucking work ig
+    //     // printf not necessarily the best option for threaded programs
+    //     perror("Memory allocation of string failed");
+    //     // error
+    // }
+
+    // // now deref ptr and set its val
+    // *(q->head) = string;
+
+    // // change fields
+    // q->numEntries += 1;
+    // q->enqueueCount += 1;
+    // // figure something out for time
+
+    // //sem_post(&resource);
+    // //sem_post(&reader);
 }
 
 //TODO: actual code lol
@@ -97,7 +115,8 @@ char *dequeueString(Queue *q) {
     printf("ayy");
     free(q->head);
     // queue is no longer empty, dequeue string by size of string being removed
-    q->head = q->head - sizeof(char**);
+    //q->head = q->head - sizeof(char**);
+    (q->head)--;
     q->numEntries -= 1;
     q->dequeueCount += 1;
     //sem_post(&resource);

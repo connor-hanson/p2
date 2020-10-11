@@ -4,6 +4,8 @@
 typedef struct {
 
     char **head; // pointer to str at top of q
+    char **tail;
+    char **firstMem;
     int numEntries;
     int capacity;
 
