@@ -17,7 +17,7 @@ Queue *createStringQueue(int size) {
         return NULL;
     }
 
-    // list is of char*, do not lose pointer. Head is dequeued
+    // list is of char*, do not lose pointer. tail is dequeued
     queue->firstMem = malloc(size * sizeof(char*));
 
     if (queue->firstMem == NULL) {
@@ -25,8 +25,16 @@ Queue *createStringQueue(int size) {
         return NULL;
     }
 
+    // assigned later
+    queue->head = NULL;
+    queue->tail = NULL; 
+
     queue->numEntries = 0;
     queue->capacity = size;
+    queue->enqueueCount = 0;
+    queue->dequeueCount = 0;
+    queue->enqueueTime = 0;
+    queue->dequeueTime = 0;
 
     // return ptr to new queue structure
     return queue;
@@ -109,14 +117,21 @@ char *dequeueString(Queue *q) {
         //sem_post(&resource);
         //sem_wait(&reader);
     }
-    char *retStr = *(q->head);
+    char *retStr = *(q->tail);
 
     // free memory BEFORE losing ptr
-    printf("ayy");
-    free(q->head);
+    //printf("ayy");
+    //free(q->head);
     // queue is no longer empty, dequeue string by size of string being removed
     //q->head = q->head - sizeof(char**);
-    (q->head)--;
+    // tail has reached beginning of alloc'd memory
+    if (q->numEntries != 1) { 
+        if (q->tail == q->firstMem) {
+            q->tail = q->firstMem + (q->capacity - 1) * sizeof(char*);
+        } else {
+            q->tail = q->tail - sizeof(char*);
+        }
+    }
     q->numEntries -= 1;
     q->dequeueCount += 1;
     //sem_post(&resource);

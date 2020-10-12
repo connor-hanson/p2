@@ -90,7 +90,7 @@ int testDequeueNoSync() {
     for (int i = 0; i < 10; ++i) {
         char *str = "yo";
         char strInt[5];
-        sprintf(strInt, "%s%d", str, i); // make each string queued up unique
+        snprintf(strInt, 10, "%s%d", str, i); // make each string queued up unique
         enqueueString(q, strInt);
         if (strcmp(*(q->head), strInt) != 0) {
             printf("%s%d%s\n", "String #", i, " should have been added to q but was not");
@@ -102,7 +102,7 @@ int testDequeueNoSync() {
     for (int i = 9; i >= 0; --i) {
         char* str = dequeueString(q);
         char strInt[5];
-        sprintf(strInt, "%s%d", str, i); // add int to str
+        snprintf(strInt, 10, "%s%d", str, i); // add int to str
         if (strcmp(str, strInt) != 0) {
             printf("%s%s%s%s\n", "Dequeued str ", str, " is not the same as test str ", strInt);
             return -1;
@@ -142,9 +142,9 @@ int main() {
         printf("Enqueing strings with no sync failed. You suck lol \n");
     } 
 
-    // if (testDequeueNoSync() == -1) {
-    //     printf("Dequeueing string with no sync failed.\n");
-    // }
+    if (testDequeueNoSync() == -1) {
+        printf("Dequeueing string with no sync failed.\n");
+    }
     // else {
     //     printf("somehow no crash?");
     // }
