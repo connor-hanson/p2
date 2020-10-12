@@ -76,34 +76,6 @@ void enqueueString(Queue *q, char *string) {
     q->enqueueCount += 1;
     return;
 
-
-    // // lock is free
-    // if (q->numEntries == 0) {
-    //     // do nothing, pointer stays where it is, but is now allocated to data
-    //     //q->head = q->data; // set initial pointer
-    // } else {
-    //     //q->head = q->head + sizeof(char**); // increment to the next pointer
-    //     (q->head)++;
-    // }
-
-    // // malloc string, ptr to char*
-    // q->head = malloc(sizeof(string));
-    // if (q->head == NULL) {
-    //     // find way to cleanly shutdown program without exit(0)
-    //     // better fucking work ig
-    //     // printf not necessarily the best option for threaded programs
-    //     perror("Memory allocation of string failed");
-    //     // error
-    // }
-
-    // // now deref ptr and set its val
-    // *(q->head) = string;
-
-    // // change fields
-    // q->numEntries += 1;
-    // q->enqueueCount += 1;
-    // // figure something out for time
-
     // //sem_post(&resource);
     // //sem_post(&reader);
 }

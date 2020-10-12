@@ -15,10 +15,12 @@ sem_t resource;
 sem_t writer;
 sem_t reader;
 
-static Queue *queue1;
-static Queue *queue2;
-static Queue *queue3;
+static Queue *q1;
+static Queue *q2;
+static Queue *q3;
 
+// Read from stdio, one line at a time. 
+// Pass each line of the input to Munch1 through a queue of character strings
 void *reader(void *arg){
 	char *input;
 	int nextChar = getc(stdin);
@@ -42,6 +44,8 @@ void *reader(void *arg){
 	}
 }
 
+// Scan line and replace each space ' ' with '*'
+// Passes this line to munch2 through a queue
 void *munch1(void *arg){
 	char *input = "";
 	while(input != NULL){
@@ -61,6 +65,8 @@ void *munch1(void *arg){
 	}
 }
 
+// Scan line and convert all lowercase to uppercase
+// pass line to writer through a queue
 void *munch2(void *arg){
 	char *input = "";
 	while(input != NULL){
@@ -81,6 +87,7 @@ void *munch2(void *arg){
 	}
 }
 
+// write line to stdio
 void *writer(void *arg){
 	char *input = "";
 	while(input != NULL){
@@ -95,9 +102,9 @@ void *writer(void *arg){
 int main(){
 	if(!(sem_init(&resource, 0, 1)) && !(sem_init(&writer, 0, 1)) && !(sem_init(&reader, 0, 1))){
 		// make queues
-		queue1 = CreateStringQueue(QUEUE_SIZE);
-		queue2 = CreateStringQueue(QUEUE_SIZE);
-		queue3 = CreateStringQueue(QUEUE_SIZE);
+		Queue *q1 = CreateStringQueue(QUEUE_SIZE);
+		Queue *q2 = CreateStringQueue(QUEUE_SIZE);
+		Queue *q3 = CreateStringQueue(QUEUE_SIZE);
 		// make threads
 		pthread_create(&read, NULL, reader, NULL);
 		pthread_create(&mun1, NULL, munch1, NULL);
