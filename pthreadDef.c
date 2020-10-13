@@ -8,7 +8,7 @@
 #include <ctype.h>
 #include "pthreadDef.h"
 
-#define BUFF_SIZE 100
+#define BUFF_SIZE 10
 
 /**
  * Reader thread function
@@ -26,16 +26,14 @@ void *reader(void *arg){
 			while(nextChar != EOF && nextChar != '\n'){ // read until end of line/EOF
 				counter++;
 				nextChar = getc(stdin);
-				if((counter-1) < BUFF_SIZE && nextChar != '\n'){
+				if((counter-1) < BUFF_SIZE && nextChar != '\n'){ // cut off part of line past allowed size
 					input[counter-1] = nextChar;
 				}
 			}
-			if((counter - 1) <= BUFF_SIZE){ // flush line if longer than allowed size
-				enqueueString((Queue *)arg, input);
+			if((counter - 1) > BUFF_SIZE){
+				fprintf(stderr, "Error: cutting off excess input\n");
 			}
-			else{
-				free(input);
-			}
+			enqueueString((Queue *)arg, input);
 			nextChar = getc(stdin);
 		}
 		else{
