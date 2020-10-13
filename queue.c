@@ -87,7 +87,7 @@ void enqueueString(Queue *q, char *string) {
     	// now allocate memory/string to tail
     	*(q->tail) = string;
 	// change queue stats
-    	q->numEntries += 1;
+    	incEntries(q);
     	incEnqueue(q);
     	clock_t end = clock();
     	double spentTime = (double)(end - start)/CLOCKS_PER_SEC; // calc time taken
@@ -118,7 +118,7 @@ char *dequeueString(Queue *q) {
         	}
     	}
     	// change queue stats
-    	q->numEntries -= 1;
+    	decEntries(q);
     	incDequeue(q);
     	clock_t end = clock();
     	double spentTime = (double)(end - start)/CLOCKS_PER_SEC; // calc time taken
