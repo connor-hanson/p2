@@ -1,4 +1,6 @@
-//Author: Connor Hanson, Tiger Ji
+// Authors: Connor Hanson, Tiger Ji
+// Connor Hanson: cbhanson2@wisc.edu - chanson
+// Tiger Ji: tfji@wisc.edu - tfji
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,4 +1,6 @@
-//Author: Connor Hanson, Tiger Ji
+// Authors: Connor Hanson, Tiger Ji
+// Connor Hanson: cbhanson2@wisc.edu - chanson
+// Tiger Ji: tfji@wisc.edu - tfji
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -37,7 +39,7 @@ Queue *createStringQueue(int size) {
     	// assigned later
     	queue->head = NULL;
     	queue->tail = NULL; 
-	// init queue stats
+	    // init queue stats
     	queue->numEntries = 0;
     	queue->capacity = size;
     	queue->enqueueCount = 0;

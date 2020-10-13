@@ -1,4 +1,6 @@
 Authors: Connor Hanson, Tiger Ji
+Connor Hanson: cbhanson2@wisc.edu - chanson
+Tiger Ji: tfji@wisc.edu - tfji
 
 To run: prodcom
   Buffer size is 100. Any strings exceeding that length will be cut short to 100 chars

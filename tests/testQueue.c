@@ -1,3 +1,7 @@
+// Authors: Connor Hanson, Tiger Ji
+// Connor Hanson: cbhanson2@wisc.edu - chanson
+// Tiger Ji: tfji@wisc.edu - tfji
+
 #include "../queue.h"
 #include "../pthreadDef.h"
 #include <stdlib.h>
