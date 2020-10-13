@@ -17,8 +17,8 @@
  */
 void printQueueStats(Queue *q){
 	fprintf(stderr,"%s%d\n", "Capacity: ", q->capacity);
-	fprintf(stderr,"%s%d\n", "Enqueue Count: ", q->enqueueCount);
-	fprintf(stderr,"%s%d\n", "Dequeue Count: ", q->dequeueCount);
+	fprintf(stderr,"%s%d\n", "Enqueue Count: ", q->enqueueCount -1);
+	fprintf(stderr,"%s%d\n", "Dequeue Count: ", q->dequeueCount-1);
 	fprintf(stderr,"%s%f\n", "Enqueue Time: ", q->enqueueTime);
 	fprintf(stderr,"%s%f\n", "Dequeue Time: ", q->dequeueTime);
 }
