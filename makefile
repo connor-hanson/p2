@@ -1,19 +1,30 @@
-ARGS = -c -Wall -Wextra -pthread -g
+CC = gcc
+WARNING_FLAGS = -Wall -Wextra
+OPTS = -pthread
+EXE = prodcom
+SCAN_BUILD_DIR = scan-build-out
 
-all: 
-	gcc $(ARGS) queue.c
-	gcc $(ARGS) main.c
-	gcc $(ARGS) pthreadDef.c
-	gcc $(ARGS) queueStat.c
-	gcc -o prodcom -Wall -Wextra -pedantic -pthread -g queue.o main.o pthreadDef.o queueStat.o
+all: main.o pthreadDef.o queueStat.o queue.o
+	$(CC) $(OPTS) -o $(EXE) main.o pthreadDef.o queueStat.o queue.o
 
-clean: 
-	rm -f queue.o pthreadDef.o queueStat.o testQueue.o main.o prodcom out
+main.o: main.c queue.h pthreadDef.h queueStat.h
+	$(CC) $(OPTS) $(WARNING_FLAGS) -c main.c
 
-test: 
-	gcc $(ARGS) queue.c
-	#gcc $(ARGS) main.c
-	gcc $(ARGS) pthreadDef.c
-	gcc $(ARGS) queueStat.c
-	gcc $(ARGS) tests/testQueue.c
-	gcc -o test -Wall -Wextra -pedantic -pthread -g queue.o pthreadDef.o queueStat.o testQueue.o
+pthreadDef.o: pthreadDef.c queue.h
+	$(CC) $(OPTS) $(WARNING_FLAGS) -c pthreadDef.c
+
+queueStat.o: queueStat.c queue.h
+	$(CC) $(OPTS) $(WARNING_FLAGS) -c queueStat.c
+	
+queue.o: queue.c queueStat.h
+	$(CC) $(OPTS) $(WARNING_FLAGS) -c queue.c
+
+clean:
+	rm -f $(EXE) *.o
+	rm -rf $(SCAN_BUILD_DIR)
+
+#
+# Run the Clang Static Analyzer
+#
+scan-build: clean
+	scan-build -o $(SCAN_BUILD_DIR) make
