@@ -8,7 +8,7 @@
 #include <ctype.h>
 #include "pthreadDef.h"
 
-#define BUFF_SIZE 10
+#define BUFF_SIZE 100
 
 /**
  * Reader thread function
@@ -20,7 +20,7 @@ void *reader(void *arg){
 	char *input;
 	char nextChar = getc(stdin);
 	while(nextChar != EOF){ // read until EOF
-		if((input = malloc(BUFF_SIZE))){ // allocate string space, make sure space allocates properly
+		if((input = calloc(BUFF_SIZE, sizeof(char)))){ // allocate string space, make sure space allocates properly
 			input[0] = nextChar; // build string
 			int counter = 1; // line length
 			while(nextChar != EOF && nextChar != '\n'){ // read until end of line/EOF

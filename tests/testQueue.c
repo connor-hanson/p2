@@ -1,4 +1,5 @@
 #include "../queue.h"
+#include "../pthreadDef.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -79,7 +80,7 @@ int testEnqueueNoSync() {
         printf("%s%s%s\n", "String ", str, " should not have been added to queue. Queue is at capacity");
         return -1;
     }
-
+    free(q);
     return 1; // all is good in the world
 }
 
@@ -215,11 +216,26 @@ int testEnqueueAndDequeueNoSync() {
 }
 
 // tests with sync
-int testEnqueueWithSync() {
+int testReader() {
+    FILE *f1 = fopen("testFile1.txt", "r"); // simple text. No tomfoolery here
+    Queue *q1 = createStringQueue(10);
+    void *rdr = reader(q1);
+    if (rdr != NULL) {
+        printf("Reader did not return null. Must've returned exit");
+        return -1;
+    }
     return 0;
 }
 
-int testDequeueWithSync() {
+int testMunch1() {
+    return 0;
+}
+
+int testMunch2() {
+    return 0;
+}
+
+int testWriter() {
     return 0;
 }
 
@@ -239,6 +255,10 @@ int main() {
 
     if (testEnqueueAndDequeueNoSync() == -1) {
         printf("Enqueueing and dequeueing strings failed. shit. \n");
+    }
+
+    if (testReader() == -1) {
+        printf("Reader failed. poop");
     }
     // else {
     //     printf("somehow no crash?");
