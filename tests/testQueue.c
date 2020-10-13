@@ -17,8 +17,9 @@ int testQueueAlloc() {
         printf("firstMem is null \n");
         return -1;
     }
-    // free
 
+    free(q);
+    // freeme
     return 1;
 }
 
@@ -120,6 +121,96 @@ int testDequeueNoSync() {
 }
 
 int testEnqueueAndDequeueNoSync() {
+    Queue *q = createStringQueue(10);
+    // enqueue 10
+    for (int i = 0; i < 10; ++i) {
+        char *str = "yo";
+        char strInt[5];
+        snprintf(strInt, 10, "%s%d", str, i); // make each string queued up unique
+        enqueueString(q, strInt);
+        if (strcmp(*(q->head), strInt) != 0) {
+            printf("%s%d%s\n", "String #", i, " should have been added to q but was not");
+            return -1;
+        }
+    }
+
+    // dequeue 5
+    for (int i = 9; i >= 5; --i) {
+        char* str = dequeueString(q);
+        char strInt[5];
+        snprintf(strInt, 10, "%s%d", str, i); // add int to str
+        if (strcmp(str, strInt) != 0) {
+            printf("%s%s%s%s\n", "Dequeued str ", str, " is not the same as test str ", strInt);
+            return -1;
+        }
+    }
+
+    // enqueue 3
+    for (int i = 5; i < 8; ++i) {
+        char *str = "yo";
+        char strInt[5];
+        snprintf(strInt, 10, "%s%d", str, i); // make each string queued up unique
+        enqueueString(q, strInt);
+        if (strcmp(*(q->head), strInt) != 0) {
+            printf("%s%d%s\n", "String #", i, " should have been added to q but was not");
+            return -1;
+        }
+    }
+
+    // dequeue 8 (all)
+    for (int i = 7; i >= 0; --i) {
+        char* str = dequeueString(q);
+        char strInt[5];
+        snprintf(strInt, 10, "%s%d", str, i); // add int to str
+        if (strcmp(str, strInt) != 0) {
+            printf("%s%s%s%s\n", "Dequeued str ", str, " is not the same as test str ", strInt);
+            return -1;
+        }
+    }
+
+    // enqueue 5
+    for (int i = 0; i < 5; ++i) {
+        char *str = "yo";
+        char strInt[5];
+        snprintf(strInt, 10, "%s%d", str, i); // make each string queued up unique
+        enqueueString(q, strInt);
+        if (strcmp(*(q->head), strInt) != 0) {
+            printf("%s%d%s\n", "String #", i, " should have been added to q but was not");
+            return -1;
+        }
+    }
+
+    // dequeue 3
+    for (int i = 4; i >= 2; --i) {
+        char* str = dequeueString(q);
+        char strInt[5];
+        snprintf(strInt, 10, "%s%d", str, i); // add int to str
+        if (strcmp(str, strInt) != 0) {
+            printf("%s%s%s%s\n", "Dequeued str ", str, " is not the same as test str ", strInt);
+            return -1;
+        }
+    }
+
+    // enqueue to capacity (+8)
+    for (int i = 2; i < 9; ++i) {
+        char *str = "yo";
+        char strInt[5];
+        snprintf(strInt, 10, "%s%d", str, i); // make each string queued up unique
+        enqueueString(q, strInt);
+        if (strcmp(*(q->head), strInt) != 0) {
+            printf("%s%d%s\n", "String #", i, " should have been added to q but was not");
+            return -1;
+        }
+    }
+
+    // try to enqueue. Should fail
+    char *str = "should not work y0";
+    enqueueString(q, str);
+    if (strcmp(*(q->head), str) == 0) {
+        printf("%s\n", "String should not have been enqueued. The queue must be getting confused");
+        return -1;
+    }
+
     return 0;
 }
 
@@ -144,6 +235,10 @@ int main() {
 
     if (testDequeueNoSync() == -1) {
         printf("Dequeueing string with no sync failed.\n");
+    }
+
+    if (testEnqueueAndDequeueNoSync() == -1) {
+        printf("Enqueueing and dequeueing strings failed. shit. \n");
     }
     // else {
     //     printf("somehow no crash?");

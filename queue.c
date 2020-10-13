@@ -86,7 +86,7 @@ void enqueueString(Queue *q, char *string) {
 
     	// now allocate memory/string to tail
     	*(q->tail) = string;
-	// change queue stats
+	    // change queue stats
     	incEntries(q);
     	incEnqueue(q);
     	clock_t end = clock();
