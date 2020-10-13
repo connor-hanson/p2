@@ -1,8 +1,11 @@
-ARGS = -c -Wall -Wextra
+ARGS = -c -Wall -Wextra -pthread -g
 
 all: 
 	gcc $(ARGS) queue.c
-	gcc -o out -Wall -Wextra queue.o
+	gcc $(ARGS) main.c
+	gcc $(ARGS) pthreadDef.c
+	gcc $(ARGS) queueStat.c
+	gcc -o prodcom -Wall -Wextra -pedantic -pthread -g queue.o main.o pthreadDef.o queueStat.o
 
 clean: 
 	rm -f queue.o testQueue.o test out
