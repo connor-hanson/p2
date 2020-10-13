@@ -1,9 +1,9 @@
 Authors: Connor Hanson, Tiger Ji
 
-To run: prodcom
-  Buffer size is 100. Any strings exceeding that length will be cut short to 100 chars
-  To terminate the program: ^d. This will print the queue stats and then cleanly exit the program.
-
 Contributions:
   Connor - queue setup, enqueue/dequeue
   Tiger - sychronization and thread setup
+
+Notes:
+  Ctrl+D is EOF
+  At EOF, NULL is passed through the queue. We're including this in the enqueue and dequeue count in stats
