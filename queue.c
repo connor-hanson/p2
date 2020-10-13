@@ -1,123 +1,142 @@
+//Author: Connor Hanson, Tiger Ji
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <semaphore.h>
+#include <time.h>
 #include "queue.h"
+#include "queueStat.h"
 
-//Dynamically allocate a new Queue structure and initialize it with an array of character points of length size. 
-//That means you'll malloc the queue structure and then malloc the char ** array pointed to from that structure. 
-//Also remember to any state and synchronization variables used in this structure.
-//The function returns a pointer to the new queue structure.
-// Test with size 10
-// TODO: add synchronization
+/**
+ * Create queue
+ *
+ * @param:
+ *	int size - queue size/capacity
+ * @returns:
+ *	pointer to new Queue, or NULL if unsuccessful
+ */
 Queue *createStringQueue(int size) {
-    Queue *queue = malloc(sizeof(Queue));
+	Queue *queue = malloc(sizeof(Queue));
 
-    if (queue == NULL) {
-        printf("Error allocating memory to Queue**");
-        return NULL;
-    }
+	if (queue == NULL) {
+		printf("Error allocating memory to Queue**");
+		return NULL;
+	}
 
-    // list is of char*, do not lose pointer. tail is dequeued
-    queue->firstMem = malloc(size * sizeof(char*));
+    	// list is of char*, do not lose pointer. tail is dequeued
+    	queue->firstMem = malloc(size * sizeof(char*));
 
-    if (queue->firstMem == NULL) {
-        printf("Error allocating memory to queue data");
-        return NULL;
-    }
+    	if (queue->firstMem == NULL) {
+        	printf("Error allocating memory to queue data");
+        	return NULL;
+    	}
 
-    // assigned later
-    queue->head = NULL;
-    queue->tail = NULL; 
-
-    queue->numEntries = 0;
-    queue->capacity = size;
-    queue->enqueueCount = 0;
-    queue->dequeueCount = 0;
-    queue->enqueueTime = 0;
-    queue->dequeueTime = 0;
-
-    // return ptr to new queue structure
-    return queue;
+    	// assigned later
+    	queue->head = NULL;
+    	queue->tail = NULL; 
+	// init queue stats
+    	queue->numEntries = 0;
+    	queue->capacity = size;
+    	queue->enqueueCount = 0;
+    	queue->dequeueCount = 0;
+    	queue->enqueueTime = 0;
+    	queue->dequeueTime = 0;
+    	// return NULL if any sem initializes unsuccessfully
+    	if(sem_init(&queue->resource, 0, 1)){
+    		return NULL;
+    	}
+    	if(sem_init(&queue->full, 0, 0)){
+    		return NULL;
+    	}
+    	if(sem_init(&queue->empty, 0, queue->capacity)){
+    		return NULL;
+    	}
+    	
+    	// return ptr to new queue structure
+    	return queue;
 }
 
-// places the pointer to the string at the end of the queue. 
-// If the queue is full, block until space is available
+/**
+ * Enqueues string into queue
+ *
+ * @param:
+ *	Queue *q - pointer to queue to alter
+ *	char *string - string to be enqueued
+ */
 void enqueueString(Queue *q, char *string) {
-    //sem_wait(&resource);
-    // if the queue is full, wait
-    if (q->numEntries == q->capacity) {
-        return; // FIXME
-        //sem_post(&resource);
-        //sem_wait(&writer);
-    }
+	clock_t start = clock(); // Begin clock
+    	sem_wait(&q->empty); // wait if queue full
+    	sem_wait(&q->resource); // wait if queue is being changed
+    	// move head/tail pointer to firstMem if empty
+    	if (q->numEntries == 0) {
+        	q->head = q->firstMem;
+        	q->tail = q->firstMem;
+    	} else {
+        	// get check that tail is not at end of alloc'd memory
+        	int memDiff = (q->tail - q->firstMem);
+        	int okDiff = (q->capacity - 1) * sizeof(char*);
 
-    // move head/tail pointer to firstMem if empty
-    if (q->numEntries == 0) {
-        q->head = q->firstMem;
-        q->tail = q->firstMem;
-    } else {
-        // get check that tail is not at end of alloc'd memory
-        int memDiff = (q->tail - q->firstMem);
-        int okDiff = (q->capacity - 1) * sizeof(char*);
+        	if (memDiff == okDiff) { // loop round to first byte of ok memory
+            		q->tail = q->firstMem;
+            		printf("resetting mem");
+        	} else {
+            		q->tail = q->tail + sizeof(char*); // increment by a ptr location. ++ should do this
+       	}
+    	}
 
-        if (memDiff == okDiff) { // loop round to first byte of ok memory
-            q->tail = q->firstMem;
-            printf("resetting mem");
-        } else {
-            q->tail = q->tail + sizeof(char*); // increment by a ptr location. ++ should do this
-        }
-    }
-
-    // now allocate memory/string to tail
-    //q->tail = malloc(sizeof(string));
-    *(q->tail) = string;
-
-    q->numEntries += 1;
-    q->enqueueCount += 1;
-    return;
-
-    // //sem_post(&resource);
-    // //sem_post(&reader);
+    	// now allocate memory/string to tail
+    	*(q->tail) = string;
+	// change queue stats
+    	q->numEntries += 1;
+    	incEnqueue(q);
+    	clock_t end = clock();
+    	double spentTime = (double)(end - start)/CLOCKS_PER_SEC; // calc time taken
+    	addETime(q, spentTime);
+    	sem_post(&q->resource);
+    	sem_post(&q->full); // release any waiting dequeues
 }
 
-//TODO: actual code lol
+/**
+ * Dequeues string from queue
+ *
+ * @param:
+ *	Queue *q - pointer to queue to alter
+ * @returns:
+ *	string dequeued
+ */
 char *dequeueString(Queue *q) {
-    //sem_wait(&resource);
-    // if queue is empty, wait
-    if(q->numEntries == 0) {
-        return NULL; // FIXME when synchronization implemented
-        //sem_post(&resource);
-        //sem_wait(&reader);
-    }
-    char *retStr = *(q->tail);
-
-    // free memory BEFORE losing ptr
-    //printf("ayy");
-    //free(q->head);
-    // queue is no longer empty, dequeue string by size of string being removed
-    //q->head = q->head - sizeof(char**);
-    // tail has reached beginning of alloc'd memory
-    if (q->numEntries != 1) { 
-        if (q->tail == q->firstMem) {
-            q->tail = q->firstMem + (q->capacity - 1) * sizeof(char*);
-        } else {
-            q->tail = q->tail - sizeof(char*);
-        }
-    }
-    q->numEntries -= 1;
-    q->dequeueCount += 1;
-    //sem_post(&resource);
-    //sem_post(&writer);
-    
-    return retStr;
+	clock_t start = clock(); // begin clock
+    	sem_wait(&(q->full)); // wait if queue empty
+    	sem_wait(&(q->resource)); // wait if queue being changed
+    	char *retStr = *(q->tail);
+    	
+    	if (q->numEntries != 1) { 
+        	if (q->tail == q->firstMem) {
+            		q->tail = q->firstMem + (q->capacity - 1) * sizeof(char*);
+        	} else {
+            		q->tail = q->tail - sizeof(char*);
+        	}
+    	}
+    	// change queue stats
+    	q->numEntries -= 1;
+    	incDequeue(q);
+    	clock_t end = clock();
+    	double spentTime = (double)(end - start)/CLOCKS_PER_SEC; // calc time taken
+    	addDTime(q, spentTime);
+    	sem_post(&(q->resource));
+    	sem_post(&(q->empty)); // release any waiting enqueues
+    	return retStr;
 }
 
-void printQueueStats(Queue *q) {
-    printf("%s\n", "Queue Statistics: ");
-    printf("%s%d\n", "Number of entries: ", q->numEntries);
-    printf("%s%d\n", "Capacity: ", q->capacity);
-    printf("%s%d\n", "Enqueue Count: ", q->enqueueCount);
-    printf("%s%d\n", "Dequeue Count: ", q->dequeueCount);
-    printf("%s%d\n", "Enqueue Time: ", q->enqueueTime);
-    printf("%s%d\n", "Dequeue Time: ", q->dequeueTime);
+/**
+ * Frees allocated space from elements of queue
+ *
+ * @param:
+ *	Queue *q - pointer to queue to free
+ */
+void freeQueue(Queue *q){
+	free(q->firstMem); // free malloced firstMem
+	sem_destroy(&q->resource); // free semaphors
+	sem_destroy(&q->full);
+	sem_destroy(&q->empty);
 }
