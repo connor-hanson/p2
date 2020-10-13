@@ -7,5 +7,5 @@ Contributions:
   Tiger - sychronization and thread setup
 
 Notes:
-  Ctrl+D is EOF
+  Ctrl+d (EOF) terminates the program in a graceful manner, printing out the desired queue statistics. 
   At EOF, NULL is passed through the queue. We're including this in the enqueue and dequeue count in stats
