@@ -37,7 +37,8 @@ void *reader(void *arg){
 				enqueueString((Queue *)arg, input);
 			}
 			else{
-				exit(EXIT_FAILURE);
+				//exit(EXIT_FAILURE);
+				return NULL;
 			}
 		}
 		nextChar = getc(stdin);

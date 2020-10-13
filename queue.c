@@ -83,7 +83,6 @@ void enqueueString(Queue *q, char *string) {
 
         	if (memDiff == okDiff) { // loop round to first byte of ok memory
             		q->tail = q->firstMem;
-            		printf("resetting mem");
         	} else {
             		q->tail = q->tail + sizeof(char*); // increment by a ptr location. ++ should do this
        	}
