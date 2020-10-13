@@ -20,6 +20,7 @@ Queue *createStringQueue(int size) {
 
 	if (queue == NULL) {
 		printf("Error allocating memory to Queue**");
+        free(queue);
 		return NULL;
 	}
 
@@ -28,6 +29,8 @@ Queue *createStringQueue(int size) {
 
     	if (queue->firstMem == NULL) {
         	printf("Error allocating memory to queue data");
+            free(queue->firstMem); 
+            free(queue);
         	return NULL;
     	}
 
