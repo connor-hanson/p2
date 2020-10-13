@@ -1,6 +1,4 @@
-// Authors: Connor Hanson, Tiger Ji
-// Connor Hanson: cbhanson2@wisc.edu - chanson
-// Tiger Ji: tfji@wisc.edu - tfji
+//Author: Connor Hanson, Tiger Ji
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +8,7 @@
 #include <ctype.h>
 #include "pthreadDef.h"
 
-#define BUFF_SIZE 100
+#define BUFF_SIZE 10
 
 /**
  * Reader thread function
@@ -22,25 +20,27 @@ void *reader(void *arg){
 	char *input;
 	char nextChar = getc(stdin);
 	while(nextChar != EOF){ // read until EOF
-		if((input = calloc(BUFF_SIZE, sizeof(char)))){ // allocate string space, make sure space allocates properly
-			input[0] = nextChar; // build string
-			int counter = 1; // line length
-			while(nextChar != EOF && nextChar != '\n'){ // read until end of line/EOF
-				counter++;
-				nextChar = getc(stdin);
-				if((counter-1) < BUFF_SIZE && nextChar != '\n'){ // cut off part of line past allowed size
-					input[counter-1] = nextChar;
+		if(nextChar != '\n'){
+			if((input = malloc(BUFF_SIZE))){ // allocate string space, make sure space allocates properly
+				input[0] = nextChar; // build string
+				int counter = 1; // line length
+				while(nextChar != EOF && nextChar != '\n'){ // read until end of line/EOF
+					counter++;
+					nextChar = getc(stdin);
+					if((counter-1) < BUFF_SIZE && nextChar != '\n'){
+						input[counter-1] = nextChar;
+					}
 				}
+				if((counter - 1) > BUFF_SIZE){ // flush line if longer than allowed size
+					fprintf(stderr, "\nError: cutting off excess input\n");
+				}
+				enqueueString((Queue *)arg, input);
 			}
-			if((counter - 1) > BUFF_SIZE){
-				fprintf(stderr, "Error: cutting off excess input\n");
+			else{
+				exit(EXIT_FAILURE);
 			}
-			enqueueString((Queue *)arg, input);
-			nextChar = getc(stdin);
 		}
-		else{
-			exit(EXIT_FAILURE);
-		}
+		nextChar = getc(stdin);
 	}
 	enqueueString((Queue *)arg, NULL); // enqueue NULL at EOF
 	return NULL;
