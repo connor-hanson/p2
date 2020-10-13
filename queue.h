@@ -1,8 +1,6 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#include <semaphore.h>
-
 typedef struct {
 
     char **head; // pointer to str at top of q
