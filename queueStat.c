@@ -41,6 +41,25 @@ void incDequeue(Queue *q){
 	q->dequeueCount += 1;
 }
 
+/**
+ * Increments entries count
+ *
+ * @param:
+ *	Queue *q - pointer to queue to have stat changed
+ */
+void incEntries(Queue *q){
+	q->numEntries += 1;
+}
+
+/**
+ * Decrements entries count
+ *
+ * @param:
+ *	Queue *q - pointer to queue to have stat changed
+ */
+void decEntries(Queue *q){
+	q->numEntries -= 1;
+}
 
 /**
  * Adds to total enqueue time
