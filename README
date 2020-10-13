@@ -1,0 +1,5 @@
+Authors: Connor Hanson, Tiger Ji
+
+Contributions:
+  Connor - queue setup, enqueue/dequeue
+  Tiger - sychronization and thread setup
